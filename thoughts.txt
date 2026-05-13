@@ -1,0 +1,4 @@
+>>> May 13th, 2026.
+    when the seed changes, the next state (number) also changes,
+    adding 2 bits in "self.state = x^2" would make the results sometimes irregular and not mathematically deterministic.
+    as for now, I have no idea about absolute randomness.
