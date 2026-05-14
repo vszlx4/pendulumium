@@ -2,3 +2,9 @@
     when the seed changes, the next state (number) also changes,
     adding 2 bits in "self.state = x^2" would make the results sometimes irregular and not mathematically deterministic.
     as for now, I have no idea about absolute randomness.
+
+>>> May 14th, 2026.
+    the idea changed, I switched to a UUID generator,
+    it uses timestamp + process ID (pid), counter (it reduced collisions while rapid generating), and entropy.
+    both combined makes a 128bit UUID that can be easily indexed and sorted.
+    tested the generator on a 10 million rapid generations, and I had 0 duplications.
