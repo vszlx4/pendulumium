@@ -24,8 +24,8 @@ Collision resistance:
 Caveats:
   1. Counter overflow: >16_383 IDs/ms spins until the next millisecond.
   2. Clock rollback: monotonicity breaks on NTP sync or manual clock changes.
-  3. Node ID collisions: PID+hostname hash may collide in containerised/k8s environments.
-  4. Fork safety: node ID is cached at class load; child processes must reinitialise.
+  3. Node ID collisions: PID+hostname hash may collide in containerized/k8s environments.
+  4. Fork safety: node ID is cached at class load; child processes must reinitialize.
 """
 
 
