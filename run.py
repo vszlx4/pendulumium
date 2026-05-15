@@ -26,6 +26,8 @@ CONSIDERATIONS:
    stale in child processes, potentially causing identifier conflicts.
 """
 
+# Worst-case probabilistic uniqueness: approximately 2^48 (281 trillion possibilities).
+
 class Pendulumium: # uppercase "P" due to Python's PascalCase naming convention. :<
   last_timestamp = 0; counter = 0; _lock = threading.Lock()
 
@@ -52,4 +54,9 @@ class Pendulumium: # uppercase "P" due to Python's PascalCase naming convention.
     uuid_hex = f"{uuid_int:032x}"
     return uuid_hex if not formatted else f"{uuid_hex[:12]}-{uuid_hex[12:16]}-{uuid_hex[16:20]}-{uuid_hex[20:]}"
   
-Pendulumium.nanoTSID()
+seen = set()
+
+for i in range(10_000_000):
+  seen.add(Pendulumium.nanoTSID())
+
+print(f"{len(seen):,.0f}")

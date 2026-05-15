@@ -8,3 +8,8 @@
     it uses timestamp + process ID (pid), counter (it reduced collisions while rapid generating), and entropy.
     both combined makes a 128bit UUID that can be easily indexed and sorted.
     tested the generator on a 10 million rapid generations, and I had 0 duplications.
+
+>>> May 15th, 2026.
+    dumpeddddddd...
+    128bits seems a bit off, I'll see if I can make it UUID-friendly,
+    otherwise I'll just make it 256bits or 512bits.
