@@ -9,9 +9,9 @@ import threading
 LAYOUT (128 bits - UUID v7 compliant):
 
   [127:80]  48 bits  Unix timestamp in milliseconds
-  [79:76]    4 bits  Version = 0b0111  (UUID v7)
+  [79:76]    4 bits  Version = 0b0111 (UUID v7)
   [75:64]   12 bits  Sub-millisecond nanosecond remainder (0-999_999), scaled to 12 bits
-  [63:62]    2 bits  Variant = 0b10    (RFC 9562 required)
+  [63:62]    2 bits  Variant = 0b10 (RFC 9562 required)
   [61:48]   14 bits  Monotonic sequence counter (resets per millisecond)
   [47:32]   16 bits  Node ID: SHA-256(PID + hostname), truncated
   [31:0]    32 bits  Cryptographic entropy
