@@ -50,7 +50,7 @@ class Pendulumium:
     ms = ns_total // 1_000_000
     ns_rem = ns_total % 1_000_000
     return ms, ns_rem
-  
+
   @classmethod
   def p0111(cls, as_string: bool = True, formatted: bool = True) -> "int | str":
     with cls._lock:
@@ -102,6 +102,3 @@ class Pendulumium:
       if not as_string: return uuid_int
       h = f"{uuid_int:032x}"
       return h if not formatted else f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
-    
-for i in range(1_000_000):
-  print(Pendulumium.p0111())
