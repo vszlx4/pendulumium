@@ -52,7 +52,7 @@ class Pendulumium:
     return ms, ns_rem
 
   @classmethod
-  def p0111(cls, as_string: bool = True, formatted: bool = True) -> "int | str":
+  def uuid7(cls, as_string: bool = True, formatted: bool = True) -> "int | str":
     with cls._lock:
       ms, ns_rem = cls._now_ns()
 
