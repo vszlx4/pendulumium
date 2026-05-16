@@ -14,5 +14,10 @@
     128bits seems a bit off, I'll see if I can make it UUID-friendly,
     otherwise I'll just make it 256bits or 512bits.
 
->>> May 16th, 2026.
+>>> May 16th, 2026. Part 1
     later on this day I'll put more details here
+
+>>> May 16th, 2026. Part 2
+    now the generator makes a UUIDv7 compliant identifiers,
+    I'll split the additional features into three major updates,
+    probably will start with decoder, to_datetime, and batch functions now.

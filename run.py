@@ -73,7 +73,7 @@ class Pendulumium:
         cls._counter = 0
         cls._last_ms = ms
         cls._last_ns = ns_rem
-      
+
       ts      = ms & ((1 << 48) - 1)
       sub_ms  = (ns_rem * 0xFFF) // 999_999 #scale NS remainder to 12 bits
       seq     = cls._counter & 0x3FFF
