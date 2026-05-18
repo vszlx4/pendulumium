@@ -18,6 +18,7 @@ from .exceptions import (
 )
 from ._generator import Pendulumium
 from ._decoder import decode, to_datetime, to_unix_ms
+from ._validator import is_valid, is_v7
 
 uuid7 = Pendulumium.uuid7
 
@@ -29,10 +30,13 @@ __all__ = [
   "decode",
   "to_datetime",
   "to_unix_ms",
+  # validation
+  "is_valid",
+  "is_v7",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
-  "InvalidUUIDError"
+  "InvalidUUIDError",
 ]
 
 __version__ = "2.0.0"

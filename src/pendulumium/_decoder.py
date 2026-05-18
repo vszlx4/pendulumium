@@ -18,11 +18,7 @@ import datetime
 import re
 
 from .exceptions import InvalidUUIDError
-
-_UUID_RE = re.compile(
-  r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-  re.IGNORECASE
-)
+from ._validator import is_valid, is_v7
 
 
 def _validate_v7(uuid: str) -> int:
@@ -32,21 +28,16 @@ def _validate_v7(uuid: str) -> int:
     - the version nibble isn't 7
     - the variant bits aren't 0b10
   """
-  if not _UUID_RE.match(uuid):
+  if not is_valid(uuid):
     raise InvalidUUIDError(uuid, "does not match 8-4-4-4-12 UUID format")
 
-  clean    = uuid.replace("-", "")
-  uuid_int = int(clean, 16)
-
-  version = (uuid_int >> 76) & 0xF
-  if version != 7:
+  if not is_v7(uuid):
+    clean   = uuid.replace("-", "")
+    version = (int(clean, 16) >> 76) & 0xF
     raise InvalidUUIDError(uuid, f"version nibble is {version}, expected 7")
-  
-  variant = (uuid_int >> 62) & 0b11
-  if variant != 0b10:
-    raise InvalidUUIDError(uuid, f"variant bits are {variant:#04b}, expected 0b10")
-  
-  return uuid_int
+
+  return int(uuid.replace("-", ""), 16)
+
 
 def decode(uuid: str) -> dict[str, object]:
   """
