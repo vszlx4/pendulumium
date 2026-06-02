@@ -22,6 +22,7 @@ from .inspection.decoder import decode, to_datetime, to_unix_ms
 from .inspection.validator import is_valid, is_v7
 from .inspection.compare import compare, sort
 from .utils.convert import to_hex, to_int, to_bytes, from_int, from_bytes
+from .utils.time import age, between, from_datetime, from_unix_ms
 
 uuid7 = Pendulumium.uuid7
 
@@ -47,6 +48,11 @@ __all__ = [
   "from_bytes",
   # batch
   "batch",
+  # time
+  "age",
+  "between",
+  "from_datetime",
+  "from_unix_ms",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
