@@ -19,6 +19,7 @@ from .exceptions import (
 from ._generator import Pendulumium
 from ._decoder import decode, to_datetime, to_unix_ms
 from ._validator import is_valid, is_v7
+from ._compare import compare, sort
 
 uuid7 = Pendulumium.uuid7
 
@@ -33,6 +34,9 @@ __all__ = [
   # validation
   "is_valid",
   "is_v7",
+  # comparison
+  "compare",
+  "sort",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",

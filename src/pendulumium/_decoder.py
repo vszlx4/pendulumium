@@ -15,7 +15,6 @@ Mirrors the exact bit layout from _generator.py:
 from __future__ import annotations
 
 import datetime
-import re
 
 from .exceptions import InvalidUUIDError
 from ._validator import is_valid, is_v7
