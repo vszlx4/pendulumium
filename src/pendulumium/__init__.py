@@ -20,6 +20,7 @@ from ._generator import Pendulumium
 from ._decoder import decode, to_datetime, to_unix_ms
 from ._validator import is_valid, is_v7
 from ._compare import compare, sort
+from ._convert import to_hex, to_int, to_bytes, from_int, from_bytes
 
 uuid7 = Pendulumium.uuid7
 
@@ -37,6 +38,12 @@ __all__ = [
   # comparison
   "compare",
   "sort",
+  # conversion
+  "to_hex",
+  "to_int",
+  "to_bytes",
+  "from_int",
+  "from_bytes",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
