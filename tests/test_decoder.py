@@ -1,4 +1,4 @@
-"""Tests for _decoder.py — decode(), to_datetime(), to_unix_ms()."""
+"""Tests for inspection/decoder.py — decode(), to_datetime(), to_unix_ms()."""
 
 import sys
 import time
@@ -9,7 +9,7 @@ sys.path.insert(0, "src")
 from typing import cast
 
 from pendulumium import uuid7, decode, to_datetime, to_unix_ms
-from pendulumium.exceptions import InvalidUUIDError
+from pendulumium.core.exceptions import InvalidUUIDError
 
 results = []
 

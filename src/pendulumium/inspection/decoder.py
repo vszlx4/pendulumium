@@ -1,7 +1,7 @@
 """
-_decoder.py - parse a UUID v7 back into its constituent fields.
+decoder.py - parse a UUID v7 back into its constituent fields.
 
-Mirrors the exact bit layout from _generator.py:
+Mirrors the exact bit layout from core/generator.py:
 
   [127:80]  48 bits  Unix timestamp in milliseconds
   [79:76]    4 bits  Version (always 7)
@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import datetime
 
-from .exceptions import InvalidUUIDError
-from ._validator import is_valid, is_v7
+from ..core.exceptions import InvalidUUIDError
+from .validator import is_valid, is_v7
 
 
 def _validate_v7(uuid: str) -> int:

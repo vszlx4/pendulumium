@@ -1,7 +1,7 @@
 """
-_validator.py - format and version validation for UUID v7
+validator.py - format and version validation for UUID v7
 
-Used internally by _decoder.py, _compare.py, and _convert.py
+Used internally by decoder.py, compare.py, and utils/convert.py
 to guard their inputs, and exported publicly for API-boundary validation.
 """
 

@@ -1,5 +1,5 @@
 """
-_batch.py - efficient bulk UUID v7 generation.
+batch.py - efficient bulk UUID v7 generation.
 
 Acquires the generator lock once for the entire batch rather than once
 per ID, making bulk generation faster than calling uuid7() in a loop
@@ -11,7 +11,7 @@ from __future__ import annotations
 import secrets
 import time
 
-from ._generator import Pendulumium
+from .generator import Pendulumium
 
 
 def batch(n: int, *, as_string: bool = True, formatted: bool = True) -> list[int | str]:
@@ -38,7 +38,7 @@ def batch(n: int, *, as_string: bool = True, formatted: bool = True) -> list[int
   """
   if n < 1:
     raise ValueError(f"n must be >= 1, got {n}.")
-  
+
   results = []
 
   with Pendulumium._lock:
@@ -58,7 +58,7 @@ def batch(n: int, *, as_string: bool = True, formatted: bool = True) -> list[int
             f"[!] Clock moved backwards: last={Pendulumium._last_ms} now={ms}"
           )
         Pendulumium._counter = 0
-      
+
       Pendulumium._last_ms = ms
       Pendulumium._last_ns = ns_rem
 

@@ -11,17 +11,17 @@ Quick start:
   to_datetime(uid) # datetime(2026, ..., tzinfo=UTC)
 """
 
-from .exceptions import (
+from .core.exceptions import (
   PendulumiumError,
   ClockRollbackError,
   InvalidUUIDError
 )
-from ._generator import Pendulumium
-from ._decoder import decode, to_datetime, to_unix_ms
-from ._validator import is_valid, is_v7
-from ._compare import compare, sort
-from ._convert import to_hex, to_int, to_bytes, from_int, from_bytes
-from ._batch import batch
+from .core.generator import Pendulumium
+from .core.batch import batch
+from .inspection.decoder import decode, to_datetime, to_unix_ms
+from .inspection.validator import is_valid, is_v7
+from .inspection.compare import compare, sort
+from .utils.convert import to_hex, to_int, to_bytes, from_int, from_bytes
 
 uuid7 = Pendulumium.uuid7
 

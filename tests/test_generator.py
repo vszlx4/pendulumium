@@ -1,12 +1,11 @@
-"""Tests for _generator.py - uuid7()."""
+"""Tests for core/generator.py - uuid7()."""
 
 import sys
 import threading
 sys.path.insert(0, "src")
 
 from pendulumium import uuid7, is_v7
-from pendulumium._generator import Pendulumium
-from pendulumium._compare import _to_int
+from pendulumium.core.generator import Pendulumium
 
 results = []
 

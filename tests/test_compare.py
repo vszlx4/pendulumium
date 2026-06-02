@@ -1,10 +1,10 @@
-"""Tests for _compare.py - compare() and sort()."""
+"""Tests for inspection/compare.py - compare() and sort()."""
 
 import sys
 sys.path.insert(0, "src")
 
 from pendulumium import uuid7, compare, sort
-from pendulumium.exceptions import InvalidUUIDError
+from pendulumium.core.exceptions import InvalidUUIDError
 
 results = []
 

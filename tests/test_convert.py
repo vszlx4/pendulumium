@@ -1,10 +1,10 @@
-"""Tests for _convert.py - to_hex(), to_int(), to_bytes(), from_int(), from_bytes()."""
+"""Tests for utils/convert.py - to_hex(), to_int(), to_bytes(), from_int(), from_bytes()."""
 
 import sys
 sys.path.insert(0, "src")
 
 from pendulumium import uuid7, to_hex, to_int, to_bytes, from_int, from_bytes
-from pendulumium.exceptions import InvalidUUIDError
+from pendulumium.core.exceptions import InvalidUUIDError
 
 results = []
 

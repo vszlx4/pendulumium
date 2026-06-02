@@ -61,7 +61,7 @@ class Pendulumium:
         if cls._counter > 0x3FFF:
           while True:
             ms, ns_rem = cls._now_ns()
-            if ms != cls._last_ms: 
+            if ms != cls._last_ms:
               break
             time.sleep(1e-6) #yield ~1 µs, "microsecond"
           cls._counter = 0

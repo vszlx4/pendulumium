@@ -1,17 +1,17 @@
 """
-_convert.py - format conversion utilities for UUID v7 strings.
+convert.py - format conversion utilities for UUID v7 strings.
 
 Converts between the four representations:
   - hyphenated string  "019e2c01-6909-7583-800a-8afe60572a94"  (default)
-  - raw hex string     "019e2c016909758380 0a8afe60572a94"
+  - raw hex string     "019e2c0169097583800a8afe60572a94"
   - 128-bit integer    32141683943494588...
-  - 16 bytes           b'\x01\x9e...'
+  - 16 bytes           b'\\x01\\x9e...'
 """
 
 from __future__ import annotations
 
-from .exceptions import InvalidUUIDError
-from ._validator import is_valid
+from ..core.exceptions import InvalidUUIDError
+from ..inspection.validator import is_valid
 
 
 def _clean(uuid: str) -> str:
@@ -30,7 +30,7 @@ def to_hex(uuid: str) -> str:
 
   Example:
     >>> to_hex("019e2c01-6909-7583-800a-8afe60572a94")
-    "019e2c016909758380 0a8afe60572a94"
+    "019e2c0169097583800a8afe60572a94"
   """
   return _clean(uuid)
 

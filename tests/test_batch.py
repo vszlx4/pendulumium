@@ -1,10 +1,10 @@
-"""Tests for _batch.py - batch()."""
+"""Tests for core/batch.py - batch()."""
 
 import sys
 sys.path.insert(0, "src")
 
 from pendulumium import uuid7, batch, is_v7
-from pendulumium._compare import _to_int
+from pendulumium.inspection.compare import _to_int
 
 results = []
 

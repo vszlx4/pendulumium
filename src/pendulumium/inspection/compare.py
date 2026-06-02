@@ -1,5 +1,5 @@
 """
-_comapre.py - chronological comparison and sorting for UUID v7 strings.
+compare.py - chronological comparison and sorting for UUID v7 strings.
 
 UUID v7 is designed so that lexicographic order equals chronological order
 — the timestamp occupies the most significant bits, so integer comparison
@@ -8,8 +8,8 @@ of the 128-bit value is sufficient. No field extraction needed.
 
 from __future__ import annotations
 
-from .exceptions import InvalidUUIDError
-from ._validator import is_v7
+from ..core.exceptions import InvalidUUIDError
+from .validator import is_v7
 
 
 def _to_int(uuid: str) -> int:
@@ -48,7 +48,7 @@ def sort(uuids: list[str], *, reverse: bool = False) -> list[str]:
   Args:
     uuids:   list of UUID v7 strings to sort.
     reverse: if True, sort newest first
-  
+
   Raises:
     InvalidUUIDError - if any string in the list is not a valid UUID v7.
 
