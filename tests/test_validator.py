@@ -1,4 +1,4 @@
-"""Tests for _validator.py — is_valid() and is_v7()."""
+"""Tests for inspection/validator.py — is_valid() and is_v7()."""
 
 import sys
 sys.path.insert(0, "src")

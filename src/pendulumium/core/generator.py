@@ -1,10 +1,3 @@
-import time
-import os
-import socket
-import hashlib
-import secrets
-import threading
-
 """
 LAYOUT (128 bits - UUID v7 compliant):
 
@@ -27,6 +20,13 @@ Caveats:
   3. Node ID collisions: PID+hostname hash may collide in containerized/k8s environments.
   4. Fork safety: node ID is cached at class load; child processes must reinitialize.
 """
+
+import time
+import os
+import socket
+import hashlib
+import secrets
+import threading
 
 
 class Pendulumium:
