@@ -11,20 +11,21 @@ Quick start:
   to_datetime(uid) # datetime(2026, ..., tzinfo=UTC)
 """
 
-from .core.exceptions      import (
+from .core.exceptions       import (
   PendulumiumError,
   ClockRollbackError,
   InvalidUUIDError
 )
-from .core.generator       import Pendulumium
-from .core.batch           import batch
-from .core.stream          import stream
-from .inspection.decoder   import decode, to_datetime, to_unix_ms
-from .inspection.validator import is_valid, is_v7
-from .inspection.compare   import compare, sort
-from .inspection.pretty    import pretty
-from .utils.convert        import to_hex, to_int, to_bytes, from_int, from_bytes
-from .utils.time           import age, between, from_datetime, from_unix_ms
+from .core.generator        import Pendulumium
+from .core.batch            import batch
+from .core.stream           import stream
+from .inspection.decoder    import decode, to_datetime, to_unix_ms
+from .inspection.validator  import is_valid, is_v7
+from .inspection.compare    import compare, sort
+from .inspection.pretty     import pretty
+from .inspection.collisions import check_collisions
+from .utils.convert         import to_hex, to_int, to_bytes, from_int, from_bytes
+from .utils.time            import age, between, from_datetime, from_unix_ms
 
 
 uuid7 = Pendulumium.uuid7
@@ -60,6 +61,8 @@ __all__ = [
   "pretty",
   # stream
   "stream",
+  # collisions
+  "check_collisions",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
