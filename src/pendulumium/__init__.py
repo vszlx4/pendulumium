@@ -28,6 +28,7 @@ from .inspection.gaps       import find_gaps
 from .utils.convert         import to_hex, to_int, to_bytes, from_int, from_bytes
 from .utils.time            import age, between, from_datetime, from_unix_ms, between_times
 from .utils.sql             import sql_range
+from .                      import bench
 
 
 uuid7 = Pendulumium.uuid7
@@ -70,6 +71,8 @@ __all__ = [
   "find_gaps",
   # sql
   "sql_range",
+  # bench (use as: pendulumium.bench.run(), pendulumium.bench.profile())
+  "bench",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
