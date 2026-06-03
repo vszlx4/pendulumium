@@ -24,6 +24,7 @@ from .inspection.validator  import is_valid, is_v7
 from .inspection.compare    import compare, sort
 from .inspection.pretty     import pretty
 from .inspection.collisions import check_collisions
+from .inspection.gaps       import find_gaps
 from .utils.convert         import to_hex, to_int, to_bytes, from_int, from_bytes
 from .utils.time            import age, between, from_datetime, from_unix_ms, between_times
 
@@ -64,6 +65,8 @@ __all__ = [
   "stream",
   # collisions
   "check_collisions",
+  # gaps
+  "find_gaps",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
