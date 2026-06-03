@@ -54,7 +54,7 @@ class Pendulumium:
     from pendulumium import uuid7
     uid = uuid7()
 
-  Scoped usage (explict node ID, for distributed environments):
+  Scoped usage (explicit node ID, for distributed environments):
     gen = Pendulumium(node_id=0xAB12)
     uid = gen.generate()
   """
@@ -142,7 +142,7 @@ class Pendulumium:
       last_ms         - timestamp of the most recently issued ID (Unix ms)
       counter         - current sequence value within that millisecond
       node_id         - 16-bit node identifier
-      total_generated - cumulative IDs isued since import
+      total_generated - cumulative IDs issued since import
       peak_per_ms     - highest counter value ever reached in a single ms
 
     Example:

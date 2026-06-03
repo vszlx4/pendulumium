@@ -1,4 +1,10 @@
-"""Custom exceptions for pendulumium"""
+"""
+core/exceptions.py - custom exceptions for pendulumium.
+
+  PendulumiumError   - base exception for all pendulumium errors
+  ClockRollbackError - raised when the system clock moves backwards
+  InvalidUUIDError   - raised when a string is not a valid UUID v7
+"""
 
 class PendulumiumError(Exception):
   """Base exception for all pendulumium errors."""

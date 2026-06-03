@@ -1,5 +1,8 @@
 """
-compare.py - chronological comparison and sorting for UUID v7 strings.
+inspection/compare.py - chronological comparison and sorting for UUID v7 strings.
+
+  compare(a, b)        - compare two UUIDs chronologically, returns -1 / 0 / +1
+  sort(uuids, reverse) - sort a list of UUIDs chronologically
 
 UUID v7 is designed so that lexicographic order equals chronological order
 — the timestamp occupies the most significant bits, so integer comparison

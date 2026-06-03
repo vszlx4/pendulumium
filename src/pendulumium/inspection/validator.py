@@ -1,5 +1,8 @@
 """
-validator.py - format and version validation for UUID v7
+inspection/validator.py - format and version validation for UUID v7.
+
+  is_valid(uuid)  - check 8-4-4-4-12 format (any version)
+  is_v7(uuid)     - check format + version nibble + variant bits
 
 Used internally by decoder.py, compare.py, and utils/convert.py
 to guard their inputs, and exported publicly for API-boundary validation.

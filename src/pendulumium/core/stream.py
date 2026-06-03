@@ -1,6 +1,8 @@
 """
 core/stream.py - lazy UUID v7 generator iterator.
 
+  stream(n) - lazily yield UUID v7 values one at a time
+
 Yields UUIDs one at a time rather than building a full list in memory,
 making it suitable for large volumes or indefinite generation loops.
 """

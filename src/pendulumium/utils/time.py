@@ -1,13 +1,15 @@
 """
 utils/time.py - time-based utilities for UUID v7 strings.
 
-  age(uuid)                 - how old is this ID as a timedelta
-  between(uuid, start, end) - was this ID created within a past datetime
-  from_datetime(dt)         - generate a UUID rooted at a past datetime
-  from_unix_ms(ms)          - generate a UUID rooted at a past Unix mx timestamp
+  age(uuid)                    - how old is this ID as a timedelta
+  between(uuid, start, end)    - was this ID created within a time window
+  from_datetime(dt)            - generate a UUID rooted at a past datetime
+  from_unix_ms(ms)             - generate a UUID rooted at a past Unix ms timestamp
+  between_times(start, end, n) - generate n UUIDs spread across a time range
 """
 
 from __future__ import annotations
+from typing import cast
 
 import datetime
 import secrets
@@ -68,7 +70,7 @@ def age(uuid: str) -> datetime.timedelta:
   """
   ts_ms = decode(uuid)["timestamp_ms"]
   now_ms = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1_000)
-  return datetime.timedelta(milliseconds=now_ms - int(str(ts_ms)))
+  return datetime.timedelta(milliseconds=now_ms - cast(int, ts_ms))
 
 
 def between(uuid: str, start: datetime.datetime | int, end: datetime.datetime | int) -> bool:
@@ -78,7 +80,7 @@ def between(uuid: str, start: datetime.datetime | int, end: datetime.datetime | 
   Args:
     uuid:  UUID v7 string to check.
     start: window start — UTC-aware datetime or Unix milliseconds (int).
-    end:   window start — UTC-aware datetime or Unix milliseconds (int).
+    end:   window end   — UTC-aware datetime or Unix milliseconds (int).
   
   Raises:
     InvalidUUIDError - if the string is not a valid UUID v7.
@@ -99,7 +101,7 @@ def between(uuid: str, start: datetime.datetime | int, end: datetime.datetime | 
       f"start ({start_ms}ms) must not be after end ({end_ms}ms)"
     )
   
-  ts_ms = int(str(decode(uuid)["timestamp_ms"]))
+  ts_ms = cast(int, decode(uuid)["timestamp_ms"])
   return start_ms <= ts_ms <= end_ms
 
 
@@ -129,7 +131,7 @@ def from_datetime(dt: datetime.datetime) -> str:
   
   if dt.tzinfo is None:
     raise ValueError(
-      "datetime must be UTC-aware (tzinfo required)."
+      "datetime must be UTC-aware (tzinfo required). "
       "Use datetime.timezone.utc or a similar tzinfo."
     )
   
@@ -177,7 +179,7 @@ def from_unix_ms(ms: int) -> str:
   
   if ms > now_ms:
     raise ValueError(
-      f"Timestamp {ms}ms is in the future."
+      f"Timestamp {ms}ms is in the future. "
       "from_unix_ms() only accepts past timestamps."
     )
   

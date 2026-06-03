@@ -1,5 +1,7 @@
 """
 inspection/collisions.py - duplicate detection for UUID v7 lists.
+
+  check_collisions(uuids) - detect and report duplicate UUIDs in a list
 """
 
 from __future__ import annotations
@@ -29,7 +31,7 @@ def check_collisions(uuids: list[str]) -> dict[str, object]:
 
   Example:
     >>> ids = batch(1_000_000)
-    >>> results = check_collisions(ids)
+    >>> result = check_collisions(ids)
     >>> result["collisions"]
     0
   """

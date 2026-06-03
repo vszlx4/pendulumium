@@ -1,5 +1,7 @@
 """
-batch.py - efficient bulk UUID v7 generation.
+core/batch.py - efficient bulk UUID v7 generation.
+
+  batch(n) - generate n guaranteed-monotonic UUID v7 values in one call
 
 Acquires the generator lock once for the entire batch rather than once
 per ID, making bulk generation faster than calling uuid7() in a loop

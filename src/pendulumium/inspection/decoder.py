@@ -1,5 +1,9 @@
 """
-decoder.py - parse a UUID v7 back into its constituent fields.
+inspection/decoder.py - parse a UUID v7 back into its constituent fields.
+
+  decode(uuid)      - parse all fields from a UUID v7 string
+  to_datetime(uuid) - extract creation time as a UTC-aware datetime
+  to_unix_ms(uuid)  - extract creation time as Unix milliseconds
 
 Mirrors the exact bit layout from core/generator.py:
 
