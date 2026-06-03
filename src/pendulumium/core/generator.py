@@ -1,26 +1,35 @@
 """
 core/generator.py - UUID v7 generator.
 
+  uuid7()                         - generate a single UUID v7 (class-level, shared state)
+  Pendulumium(node_id)            - scoped generator with explicit node ID
+  Pendulumium.generate()          - generate a single UUID v7 (instance-level, isolated state)
+  Pendulumium.stats()             - snapshot of current generator state
+  Pendulumium.on_clock_rollback() - register a callback for clock rollback events
+
 LAYOUT (128 bits - UUID v7 compliant):
 
   [127:80]  48 bits  Unix timestamp in milliseconds
-  [79:76]    4 bits  Version = 0b0111 (UUID v7)
+  [79:76]    4 bits  Version = 0b0111 (UUID v7, RFC 9562)
   [75:64]   12 bits  Sub-millisecond nanosecond remainder (0-999_999), scaled to 12 bits
   [63:62]    2 bits  Variant = 0b10 (RFC 9562 required)
   [61:48]   14 bits  Monotonic sequence counter (resets per millisecond)
-  [47:32]   16 bits  Node ID: SHA-256(PID + hostname), truncated
-  [31:0]    32 bits  Cryptographic entropy
+  [47:32]   16 bits  Node ID: SHA-256(PID + hostname), truncated to 16 bits
+  [31:0]    32 bits  Cryptographic entropy (secrets.randbits)
 
 Collision resistance:
   - Same-ms, same-node: sequence gives 16_384 unique slots before entropy matters
-  - Cross-node: 16-bit node ID separates instances
+  - Cross-node: 16-bit node ID separates instances on different machines
   - Worst-case: ~2^46 probabilistic uniqueness from sequence + node + entropy combined
 
 Caveats:
   1. Counter overflow: >16_383 IDs/ms spins until the next millisecond.
-  2. Clock rollback: monotonicity breaks on NTP sync or manual clock changes.
-  3. Node ID collisions: PID+hostname hash may collide in containerized/k8s environments.
-  4. Fork safety: node ID is cached at class load; child processes must reinitialize.
+  2. Clock rollback: raises RuntimeError by default; register on_clock_rollback()
+     to handle gracefully instead.
+  3. Node ID collisions: PID+hostname hash may collide in containerized, k8s,
+     or serverless environments — use Pendulumium(node_id=...) for explicit control.
+  4. Fork safety: node ID is cached at class load; child processes must call
+     _derive_node_id() to reinitialize after os.fork().
 """
 
 import time
