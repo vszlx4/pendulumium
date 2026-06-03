@@ -1,4 +1,6 @@
 """
+core/generator.py - UUID v7 generator.
+
 LAYOUT (128 bits - UUID v7 compliant):
 
   [127:80]  48 bits  Unix timestamp in milliseconds
@@ -28,77 +30,248 @@ import hashlib
 import secrets
 import threading
 
+from collections.abc import Callable
 
-class Pendulumium:
-  _lock    = threading.Lock()
-  _last_ms = 0
-  _last_ns = 0
-  _counter = 0
 
-  _node_id: int = (
+def _derive_node_id() -> int:
+  """Derive a 16-bit node ID from the current PID and hostname."""
+  return (
     int(
       hashlib.sha256(
         f"{os.getpid()}:{socket.gethostname()}".encode()
-      ).hexdigest(), 16
-      ) & 0xFFFF
+      ).hexdigest(),
+      16,
+    )
+    & 0xFFFF
   )
 
-  @classmethod
-  def _now_ns(cls) -> tuple[int, int]:
-    """Return unix_ms, nanosecond_remainder_within_that_ms"""
+
+class Pendulumium:
+  """
+  UUID v7 generator.
+
+  Class-level usage (shared state, recommended for most cases):
+    from pendulumium import uuid7
+    uid = uuid7()
+
+  Scoped usage (explict node ID, for distributed environments):
+    gen = Pendulumium(node_id=0xAB12)
+    uid = gen.generate()
+  """
+
+  _lock:              threading.Lock = threading.Lock()
+  _last_ms:           int            = 0
+  _last_ns:           int            = 0
+  _counter:           int            = 0
+  _total_generated:   int            = 0
+  _peak_per_ms:       int            = 0
+  _node_id:           int            = _derive_node_id()
+  _rollback_callback: Callable[[int, int], None] | None = None
+
+
+  def __init__(self, node_id: int | None = None) -> None:
+    """
+    Create a scoped generator instance with an optional explicit node ID.
+
+    Args:
+      node_id: a 16-bit integer (0-65535) to use as the node identifier.
+               If None, derives the node ID from PID + hostname as usual.
+
+    Raises:
+      ValueError - if node_id is out of 16-bit range.
+
+    Example:
+      >>> gen = Pendulumium(node_id=0xAB12)
+      >>> uid = gen.generate()
+    """
+    if node_id is not None:
+      if not (0 <= node_id <= 0xFFFF):
+        raise ValueError(
+          f"node_id must be in range 0-65535, got {node_id}."
+        )
+      self._instance_node_id: int | None = node_id
+    else:
+      self._instance_node_id = None
+
+    self._instance_lock:    threading.Lock = threading.Lock()
+    self._instance_last_ms: int            = 0
+    self._instance_last_ns: int            = 0
+    self._instance_counter: int            = 0
+
+  
+  @staticmethod
+  def _now_ns() -> tuple[int, int]:
+    """Return (unix_ms, nanosecond_remainder_within_that_ms)."""
     ns_total = time.time_ns()
-    ms = ns_total // 1_000_000
-    ns_rem = ns_total % 1_000_000
+    ms       = ns_total // 1_000_000
+    ns_rem   = ns_total % 1_000_000
     return ms, ns_rem
+  
 
   @classmethod
-  def uuid7(cls, as_string: bool = True, formatted: bool = True) -> "int | str":
+  def on_clock_rollback(cls, callback: Callable[[int, int], None]) -> None:
+    """
+    Register a callback invoked on clock rollback instead of raising.
+
+    By default, a clock rollback raises RuntimeError. Registering a
+    callback overrides that — the callback is called with (last_ms,
+    current_ms) and the generator spin-waits until the clock recovers,
+    keeping IDs monotonic without crashing.
+
+    Useful for long-running services where a hard crash on NTP sync
+    is unacceptable.
+
+    Args:
+      callback: callable(last_ms: int, current_ms: int) -> None.
+
+    Example:
+      >>> import logging
+      >>> Pendulumium.on_clock_rollback(
+      ...   lambda last, now: logging.warning(f"Clock rollback: {last} -> {now}")
+      ... )
+    """
+    cls._rollback_callback = callback
+
+
+  @classmethod
+  def stats(cls) -> dict[str, int]:
+    """
+    Return a snapshot of the class-level generator state.
+
+    Keys:
+      last_ms         - timestamp of the most recently issued ID (Unix ms)
+      counter         - current sequence value within that millisecond
+      node_id         - 16-bit node identifier
+      total_generated - cumulative IDs isued since import
+      peak_per_ms     - highest counter value ever reached in a single ms
+
+    Example:
+      >>> Pendulumium.stats()
+      {'last_ms': 1748475060489, 'counter': 3, 'node_id': 42139, ...}
+    """
+    with cls._lock:
+      return {
+        "last_ms":         cls._last_ms,
+        "counter":         cls._counter,
+        "node_id":         cls._node_id,
+        "total_generated": cls._total_generated,
+        "peak_per_ms":     cls._peak_per_ms,
+      }
+    
+  
+  @staticmethod
+  def _build(ms: int, ns_rem: int, seq: int, node: int) -> int:
+    """Assemble a 128-bit UUID v7 integer from its constituent fields."""
+    ts     = ms & ((1 << 48) - 1)
+    sub_ms = (ns_rem * 0xFFF) // 999_999
+
+    return (
+      (ts     << 80)
+      | (0x7    << 76)
+      | (sub_ms << 64)
+      | (0b10   << 62)
+      | (seq    << 48)
+      | (node   << 32)
+      | secrets.randbits(32)
+    ) & ((1 << 128) - 1)
+  
+
+  @staticmethod
+  def _format(uuid_int: int, as_string: bool, formatted: bool) -> int | str:
+    """Format a 128-bit integer as a UUID string or return it as-is."""
+    if not as_string:
+      return uuid_int
+    h = f"{uuid_int:032x}"
+    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}" if formatted else h
+  
+
+  @classmethod
+  def uuid7(cls, as_string: bool = True, formatted: bool = True) -> int | str:
+    """
+    Generate a single UUID v7 using shared class-level state.
+
+    Args:
+      as_string: if True (default), returns a hex string.
+                 if False, returns a 128-bit integer.
+      formatted: if True (default), inserts RFC hyphens (8-4-4-4-12).
+                 ignored when as_string is False.
+
+    Raises:
+      RuntimeError - on clock rollback (unless on_clock_rollback() is set).
+    
+    Example:
+      >>> uuid7()
+      "019e2c01-6909-7583-800a-8afe60572a94"
+    """
     with cls._lock:
       ms, ns_rem = cls._now_ns()
 
+      if ms < cls._last_ms:
+        if cls._rollback_callback is not None:
+          cls._rollback_callback(cls._last_ms, ms)
+          while ms < cls._last_ms:
+            ms, ns_rem = cls._now_ns()
+        else:
+          raise RuntimeError(
+            f"[!] Clock moved backwards: last={cls._last_ms} now={ms}"
+          )
+        
       if ms == cls._last_ms:
         cls._counter += 1
         if cls._counter > 0x3FFF:
-          while True:
+          while ms == cls._last_ms:
             ms, ns_rem = cls._now_ns()
-            if ms != cls._last_ms:
-              break
-            time.sleep(1e-6) #yield ~1 µs, "microsecond"
+            time.sleep(1e-6)
           cls._counter = 0
-          cls._last_ms = ms
-          cls._last_ns = ns_rem
       else:
-        if ms < cls._last_ms:
-          raise RuntimeError(f"[!] Clock moved backwards: last={cls._last_ms} now={ms}")
         cls._counter = 0
-        cls._last_ms = ms
-        cls._last_ns = ns_rem
+      
+      cls._last_ms = ms
+      cls._last_ns = ns_rem
+      cls._total_generated += 1
+      cls._peak_per_ms = max(cls._peak_per_ms, cls._counter)
 
-      ts      = ms & ((1 << 48) - 1)
-      sub_ms  = (ns_rem * 0xFFF) // 999_999 #scale NS remainder to 12 bits
-      seq     = cls._counter & 0x3FFF
-      node    = cls._node_id
-      entropy = secrets.randbits(32)
+      uuid_int = cls._build(ms, ns_rem, cls._counter, cls._node_id)
+    
+    return cls._format(uuid_int, as_string, formatted)
 
-      # >>> assemble 128bits
-      # [127:80] timestamp (48 bits)
-      # [79:76]  version 7 ( 4 bits, 0b0111)
-      # [75:64]  sub-ms    (12 bits)
-      # [63:62]  variant   ( 2 bits, 0b10)
-      # [61:48]  sequence  (14 bits)
-      # [47:32]  node      (16 bits)
-      # [31:0]   entropy   (32 bits)
+  
+  def generate(self, as_string: bool = True, formatted: bool = True) -> int | str:
+    """
+    Generate a single UUID v7 using this instance's isolated state.
 
-      uuid_int = (
-          (ts     << 80)
-        | (0x7    << 76)
-        | (sub_ms << 64)
-        | (0b10   << 62)
-        | (seq    << 48)
-        | (node   << 32)
-        | (entropy)
-      ) & ((1     << 128) - 1) #clamp
+    Identical behavior to uuid7() but uses a separate lock and counter,
+    so mulitple Pendulumium instances don't share sequence state.
 
-      if not as_string: return uuid_int
-      h = f"{uuid_int:032x}"
-      return h if not formatted else f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+    Args:
+      as_string: if True (default), returns a hex string.
+                 if False, returns a 128-bit integer.
+      formatted: if True (default), inserts RFC hyphens (8-4-4-4-12).
+
+    Example:
+      >>> gen = Pendulumium(node_id=0xAB12)
+      >>> gen.generate()
+      "019e2c01-6909-7ab1-800a-8afe60572a94"
+    """
+    node = self._instance_node_id if self._instance_node_id is not None \
+           else _derive_node_id()
+    
+    with self._instance_lock:
+      ms, ns_rem = self._now_ns()
+
+      if ms == self._instance_last_ms:
+        self._instance_counter += 1
+        if self._instance_counter > 0x3FFF:
+          while ms == self._instance_last_ms:
+            ms, ns_rem = self._now_ns()
+            time.sleep(1e-6)
+          self._instance_counter = 0
+      else:
+        self._instance_counter = 0
+      
+      self._instance_last_ms = ms
+      self._instance_last_ns = ns_rem
+
+      uuid_int = self._build(ms, ns_rem, self._instance_counter, node)
+
+    return self._format(uuid_int, as_string, formatted)

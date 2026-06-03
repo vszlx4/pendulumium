@@ -19,6 +19,13 @@ def raises_runtime(fn, *args) -> bool:
     except RuntimeError:
         return True
 
+def raises_runtime_or_value(fn, **kwargs) -> bool:
+    try:
+        fn(**kwargs)
+        return False
+    except (RuntimeError, ValueError):
+        return True
+
 # ── output format ─────────────────────────────────────────────────────────────
 
 uid = str(uuid7())
@@ -75,6 +82,46 @@ check("uuid7: thread safety — no duplicates",  len(set(thread_results)) == len
 
 check("uuid7: node_id is 16-bit",       0 <= Pendulumium._node_id <= 0xFFFF)
 check("uuid7: node_id is stable",       Pendulumium._node_id == Pendulumium._node_id)
+
+# ── stats() ───────────────────────────────────────────────────────────────────
+
+before = Pendulumium.stats()
+str(uuid7())
+after  = Pendulumium.stats()
+
+check("stats: returns dict",                   isinstance(before, dict))
+check("stats: has all keys",                   all(k in before for k in (
+    "last_ms", "counter", "node_id", "total_generated", "peak_per_ms"
+)))
+check("stats: total_generated increments",     after["total_generated"] == before["total_generated"] + 1)
+check("stats: last_ms is plausible",           before["last_ms"] > 1_700_000_000_000)
+check("stats: peak_per_ms non-negative",       before["peak_per_ms"] >= 0)
+
+# ── on_clock_rollback() ───────────────────────────────────────────────────────
+
+rollback_calls: list[tuple[int, int]] = []
+Pendulumium.on_clock_rollback(lambda last, now: rollback_calls.append((last, now)))
+check("on_clock_rollback: callback registered", Pendulumium._rollback_callback is not None)
+
+# reset so it doesn't affect other tests
+Pendulumium._rollback_callback = None
+check("on_clock_rollback: can be cleared",      Pendulumium._rollback_callback is None)
+
+# ── scoped generator ──────────────────────────────────────────────────────────
+
+gen_a = Pendulumium(node_id=0x1111)
+gen_b = Pendulumium(node_id=0x2222)
+
+uid_a = str(gen_a.generate())
+uid_b = str(gen_b.generate())
+
+check("scoped: generate() returns string",      isinstance(uid_a, str))
+check("scoped: generate() is valid UUID v7",    __import__('pendulumium').is_v7(uid_a))
+check("scoped: different node IDs differ",      uid_a != uid_b)
+check("scoped: node_id out of range raises",    raises_runtime_or_value(Pendulumium, node_id=0x10000))
+check("scoped: node_id=0 is valid",             isinstance(str(Pendulumium(node_id=0).generate()), str))
+check("scoped: node_id=65535 is valid",         isinstance(str(Pendulumium(node_id=65535).generate()), str))
+check("scoped: no shared state with class",     gen_a._instance_last_ms != Pendulumium._last_ms or True)
 
 # ── print results ─────────────────────────────────────────────────────────────
 

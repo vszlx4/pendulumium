@@ -29,7 +29,7 @@ uuid7 = Pendulumium.uuid7
 __all__ = [
   # generation
   "uuid7",
-  "Pendulumium",
+  "Pendulumium",  # exposes .generate(), .stats(), .on_clock_rollback()
   # decoding
   "decode",
   "to_datetime",
