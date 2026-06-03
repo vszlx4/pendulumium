@@ -18,6 +18,7 @@ from .core.exceptions      import (
 )
 from .core.generator       import Pendulumium
 from .core.batch           import batch
+from .core.stream          import stream
 from .inspection.decoder   import decode, to_datetime, to_unix_ms
 from .inspection.validator import is_valid, is_v7
 from .inspection.compare   import compare, sort
@@ -57,6 +58,8 @@ __all__ = [
   "from_unix_ms",
   # pretty
   "pretty",
+  # stream
+  "stream",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
