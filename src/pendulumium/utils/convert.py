@@ -95,7 +95,7 @@ def from_bytes(data: bytes, formatted: bool = True) -> str:
   Convert 16 raw bytes to a UUID string.
 
   Args:
-    data: exactly 16 bytes, big-endian.
+    data:      exactly 16 bytes, big-endian.
     formatted: if True (default), return a hyphenated 8-4-4-4-12 string.
                if False, returns raw 32-character hex string.
 
