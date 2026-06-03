@@ -27,6 +27,7 @@ from .inspection.collisions import check_collisions
 from .inspection.gaps       import find_gaps
 from .utils.convert         import to_hex, to_int, to_bytes, from_int, from_bytes
 from .utils.time            import age, between, from_datetime, from_unix_ms, between_times
+from .utils.sql             import sql_range
 
 
 uuid7 = Pendulumium.uuid7
@@ -67,6 +68,8 @@ __all__ = [
   "check_collisions",
   # gaps
   "find_gaps",
+  # sql
+  "sql_range",
   # exceptions
   "PendulumiumError",
   "ClockRollbackError",
