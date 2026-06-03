@@ -25,7 +25,7 @@ from .inspection.compare    import compare, sort
 from .inspection.pretty     import pretty
 from .inspection.collisions import check_collisions
 from .utils.convert         import to_hex, to_int, to_bytes, from_int, from_bytes
-from .utils.time            import age, between, from_datetime, from_unix_ms
+from .utils.time            import age, between, from_datetime, from_unix_ms, between_times
 
 
 uuid7 = Pendulumium.uuid7
@@ -57,6 +57,7 @@ __all__ = [
   "between",
   "from_datetime",
   "from_unix_ms",
+  "between_times",
   # pretty
   "pretty",
   # stream

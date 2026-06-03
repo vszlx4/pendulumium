@@ -5,7 +5,7 @@ import datetime
 sys.path.insert(0, "src")
 
 from pendulumium import uuid7, to_datetime, to_unix_ms
-from pendulumium.utils.time import age, between, from_datetime, from_unix_ms
+from pendulumium.utils.time import age, between, from_datetime, from_unix_ms, between_times
 from pendulumium.core.exceptions import InvalidUUIDError
 
 results = []
@@ -94,6 +94,31 @@ check("from_unix_ms: error on future ms",           raises(ValueError, from_unix
     int(datetime.datetime.now(tz=UTC).timestamp() * 1_000) + 999_999))
 check("from_unix_ms: error on negative",            raises(ValueError, from_unix_ms, -1))
 check("from_unix_ms: error on non-int",             raises(TypeError, from_unix_ms, 1700000000.0))
+
+# ── between_times() ───────────────────────────────────────────────────────────
+
+start_dt = datetime.datetime(2025, 1, 1, tzinfo=UTC)
+end_dt   = datetime.datetime(2026, 1, 1, tzinfo=UTC)
+bt_ids   = between_times(start_dt, end_dt, n=10)
+
+check("between_times: returns list",              isinstance(bt_ids, list))
+check("between_times: correct length",            len(bt_ids) == 10)
+check("between_times: all valid UUID v7",         all(__import__('pendulumium').is_v7(i) for i in bt_ids))
+check("between_times: chronological order",       bt_ids == __import__('pendulumium').sort(bt_ids))
+check("between_times: first within start range",  to_unix_ms(bt_ids[0])  >= int(start_dt.timestamp() * 1_000))
+check("between_times: last within end range",     to_unix_ms(bt_ids[-1]) <= int(end_dt.timestamp()   * 1_000))
+
+start_ms = int(start_dt.timestamp() * 1_000)
+end_ms   = int(end_dt.timestamp()   * 1_000)
+bt_ids2  = between_times(start_ms, end_ms, n=5)
+check("between_times: accepts int ms",            len(bt_ids2) == 5)
+check("between_times: mixed datetime and int ms", len(between_times(start_dt, end_ms, n=3)) == 3)
+
+check("between_times: n=1 returns midpoint",      len(between_times(start_dt, end_dt, n=1)) == 1)
+check("between_times: error on n=0",              raises(ValueError, between_times, start_dt, end_dt, 0))
+check("between_times: error on start >= end",     raises(ValueError, between_times, end_dt, start_dt, 5))
+check("between_times: error on future end",       raises(ValueError, between_times, start_dt,
+    datetime.datetime.now(tz=UTC) + datetime.timedelta(days=1), 5))
 
 # ── print results ─────────────────────────────────────────────────────────────
 

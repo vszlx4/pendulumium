@@ -182,3 +182,63 @@ def from_unix_ms(ms: int) -> str:
     )
   
   return _assemble(ms)
+
+
+def between_times(start: datetime.datetime | int, end: datetime.datetime | int, n: int) -> list[str]:
+  """
+  Generate *n* UUIDs with timestamps evenly distributed across [start, end].
+
+  Useful for seeding test databases with realistic temporal spread rather
+  than all IDs sharing the same creation timestamp.
+
+  Args:
+    start: range start — UTC-aware datetime or Unix milliseconds (int).
+    end:   range end   — UTC-aware datetime or Unix milliseconds (int).
+    n:     number of UUIDs to generate. Must be >= 1.
+
+  Returns:
+    List of UUID v7 strings in chronological order.
+
+  Raises:
+    TypeError  - if start or end is not a datetime or int.
+    ValueError - if start >= end, n < 1, or either timestamp is
+                 in the future or before the Unix epoch.
+
+  Example:
+    >>> start = datetime.datetime(2026, 1, 1, tzinfo=datetime.timezone.utc)
+    >>> end   = datetime.datetime(2026, 12, 31, tzinfo=datetime.timezone.utc)
+    >>> ids   = between_times(start, end, n=1_000)
+    >>> len(ids)
+    1000
+  """
+  if n < 1:
+    raise ValueError(f"n must be >= 1, got {n}.")
+  
+  start_ms = _to_ms(start)
+  end_ms   = _to_ms(end)
+
+  if start_ms < 0 or end_ms < 0:
+    raise ValueError("Timestamps must be after the Unix epoch (>= 0).")
+  
+  now_ms = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1_000)
+
+  if start_ms > now_ms or end_ms > now_ms:
+    raise ValueError(
+      "Both start and end must be in the past. "
+      "between_times() only accepts past timestamps."
+    )
+  
+  if start_ms >= end_ms:
+    raise ValueError(
+      f"start ({start_ms}ms) must be before end ({end_ms}ms)."
+    )
+  
+  # evenly space n timestamps across [start_ms, end_ms]
+  # n=1 gets the midpoint, n>1 gets evenly spaced including both endpoints
+  if n == 1:
+    timestamps = [start_ms + (end_ms - start_ms) // 2]
+  else:
+    step = (end_ms - start_ms) / (n - 1)
+    timestamps = [int(start_ms + i * step) for i in range(n)]
+
+  return [_assemble(ts) for ts in timestamps]
