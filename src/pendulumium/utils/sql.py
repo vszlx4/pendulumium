@@ -7,7 +7,6 @@ utils/sql.py - SQL query helper utilities for UUID v7.
 from __future__ import annotations
 
 import datetime
-import secrets
 
 from ..core.exceptions import InvalidUUIDError
 from ..inspection.validator import is_v7

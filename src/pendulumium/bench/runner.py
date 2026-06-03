@@ -8,7 +8,6 @@ bench/runner.py - benchmarking and profiling for pendulumium.
 from __future__ import annotations
 
 import time as _time
-import statistics
 
 from ..core.generator import Pendulumium
 from ..core.batch import batch
@@ -105,7 +104,7 @@ def profile(seconds: float = 5.0, *, verbose: bool = True) -> dict[str, object]:
 
   Unlike run(), which tests a fixed number of IDs, profile() runs for
   a fixed duration and measures what actually happened — useful for 
-  detecting counter overflow prssure and sustained throughput.
+  detecting counter overflow pressure and sustained throughput.
 
   Args:
     seconds: how long to run in seconds (default 5.0).
