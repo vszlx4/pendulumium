@@ -1,5 +1,5 @@
 """
-convert.py - format conversion utilities for UUID v7 strings.
+utils/convert.py - format conversion utilities for UUID v7 strings.
 
 Converts between the four representations:
   - hyphenated string  "019e2c01-6909-7583-800a-8afe60572a94"  (default)

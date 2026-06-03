@@ -241,7 +241,7 @@ class Pendulumium:
     Generate a single UUID v7 using this instance's isolated state.
 
     Identical behavior to uuid7() but uses a separate lock and counter,
-    so mulitple Pendulumium instances don't share sequence state.
+    so multiple Pendulumium instances don't share sequence state.
 
     Args:
       as_string: if True (default), returns a hex string.

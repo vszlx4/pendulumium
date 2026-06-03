@@ -14,8 +14,6 @@ from typing import cast
 import datetime
 import secrets
 
-from ..core.exceptions import InvalidUUIDError
-from ..core.generator import Pendulumium
 from ..inspection.decoder import decode
 
 def _to_ms(t: datetime.datetime | int) -> int:
@@ -109,7 +107,7 @@ def from_datetime(dt: datetime.datetime) -> str:
   """
   Generate a UUID v7 rooted at a specific past UTC datetime.
 
-  Useful for data migrations. seeding test fixtures, or reconstructing
+  Useful for data migrations, seeding test fixtures, or reconstructing
   historical records. The entropy field is freshly randomized so two
   calls with the same datetime produce different UUIDs.
 
@@ -143,7 +141,7 @@ def from_datetime(dt: datetime.datetime) -> str:
   
   if ts_ms > now_ms:
     raise ValueError(
-      f"datetime is in the future ({dt.isoformat()})."
+      f"datetime is in the future ({dt.isoformat()}). "
       "from_datetime() only accepts past timestamps."
     )
   
