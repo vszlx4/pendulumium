@@ -10,16 +10,20 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 authors = [{ name = "Ahmed Mughram", email = "ahmed@mughram.com" }]
-keywords = ["uuid", "uuid7", "identifier", "time-sorted", "rfc9562"]
+keywords = ["uuid", "uuid7", "identifier", "time-sorted", "rfc9562", "collision-resistant"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
     "Typing :: Typed",
 ]
 dependencies = []
@@ -33,16 +37,17 @@ dev = [
 ]
 
 [project.urls]
-Homepage   = "https://github.com/vszlx4/pendulumium"
-Repository = "https://github.com/vszlx4/pendulumium"
-Issues     = "https://github.com/vszlx4/pendulumium/issues"
+Homepage      = "https://github.com/vszlx4/pendulumium"
+Repository    = "https://github.com/vszlx4/pendulumium"
+Issues        = "https://github.com/vszlx4/pendulumium/issues"
+Changelog     = "https://github.com/vszlx4/pendulumium/releases"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.ruff]
 line-length = 88
-src = ["src"]
+src         = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
@@ -56,3 +61,11 @@ explicit_package_bases = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts   = "-v"
+
+[tool.coverage.run]
+source = ["src/pendulumium"]
+omit   = ["*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
